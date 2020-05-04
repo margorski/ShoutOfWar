@@ -25,8 +25,16 @@ namespace ShoutOfWar.Engine
         public void AddFrame(SpriteFrame spriteFrame)
         {
             frames.Add(spriteFrame);
+        }        
+
+        public void SetFrame(int frameIndex)
+        {
+            if (frameIndex < 0) throw new ArgumentException("Frame index cannot be negative.");
+            if (frameIndex > frames.Count - 1) throw new Exception("Frame index out of frames array boundaries.");
+            currentFrameIndex = frameIndex;
+            currentTime = 0.0;
         }
-        
+
         public SpriteFrame GetFrame()
         {
             if (frames.Count == 0) throw new Exception("Animation is empty. Please add frames to animation class.");

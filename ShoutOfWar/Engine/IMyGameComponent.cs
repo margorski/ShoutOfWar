@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ShoutOfWar.Engine
 {
-    interface IGameComponent
+    interface IMyGameComponent
     {
         void Update(GameTime gameTime);
         void Draw(GameTime gameTime);

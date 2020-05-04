@@ -2,6 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShoutOfWar.Engine;
+using ShoutOfWar.MyGame;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using TexturePackerLoader;
 using TexturePackerMonoGameDefinitions;
 
@@ -16,15 +20,22 @@ namespace ShoutOfWar
         SpriteBatch spriteBatch;
         SpriteRender spriteRender;
 
+        Random random = new Random();
+
         // to be moved to Scene
         SpriteSheet spriteSheet;
 
-        // To be moved to Entity        
-        Animation playerAnimation = new Animation(200.0);
+        List<IMyGameComponent> gameComponents = new List<IMyGameComponent>();
+
+        readonly Point ScreenSize = new Point(1280, 1024);
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = ScreenSize.X;
+            graphics.PreferredBackBufferHeight = ScreenSize.Y;
+            graphics.ApplyChanges();
+
             Content.RootDirectory = "Content";
         }
 
@@ -37,6 +48,14 @@ namespace ShoutOfWar
         protected override void Initialize()
         {
             base.Initialize();
+
+            gameComponents.Add(new Player(spriteSheet, spriteRender));
+
+            for (var i = 0; i < 10; i++)
+            {
+                var randomPosition = new Vector2(random.Next(ScreenSize.X), random.Next(ScreenSize.Y));
+                gameComponents.Add(new Npc(spriteSheet, spriteRender, randomPosition));
+            }
         }
 
         /// <summary>
@@ -50,11 +69,6 @@ namespace ShoutOfWar
 
             var spriteSheetLoader = new SpriteSheetLoader(Content, GraphicsDevice);
             spriteSheet = spriteSheetLoader.Load(@"Spritesheets\mlm_armies\mlm_armies.png");
-
-            playerAnimation.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_0));
-            playerAnimation.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_1));
-            playerAnimation.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_2));
-            playerAnimation.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_3));
         }
 
         /// <summary>
@@ -75,7 +89,7 @@ namespace ShoutOfWar
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            playerAnimation.Update(gameTime);
+            foreach (var component in gameComponents) component.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -88,15 +102,10 @@ namespace ShoutOfWar
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            this.spriteBatch.Begin();
+            this.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
 
-            this.spriteRender.Draw(
-                playerAnimation.GetFrame(),
-                new Vector2(300, 300),
-                Color.White,
-                0,
-                1
-                );
+            foreach (var component in gameComponents) component.Draw(gameTime);            
+
             this.spriteBatch.End();
 
             base.Draw(gameTime);
