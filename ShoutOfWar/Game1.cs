@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using TexturePackerLoader;
 using TexturePackerMonoGameDefinitions;
 using ShoutOfWar.Game.Shared;
+using MonoGame.Extended;
 
 namespace ShoutOfWar
 {

@@ -9,6 +9,7 @@ namespace ShoutOfWar.Engine
 {    
     abstract class Component
     {
+        public bool enabled = true;
         public Entity parent = null;
         public abstract void Draw(GameTime gameTime);
         public abstract void Init();

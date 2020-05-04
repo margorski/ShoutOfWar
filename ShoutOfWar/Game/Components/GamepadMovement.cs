@@ -32,6 +32,8 @@ namespace ShoutOfWar.Game.Components
 
         public override void Update(GameTime gameTime)
         {
+            if (!enabled) return;
+
             if (velocity == null)
             {
                 velocity = parent.GetComponent<Velocity>().FirstOrDefault();
@@ -40,6 +42,16 @@ namespace ShoutOfWar.Game.Components
             if (velocity != null) {
                 velocity.value = new Vector2(maxSpeed, -maxSpeed) * GamePad.GetState(PlayerIndex.One).ThumbSticks.Left;
             }
+        }
+
+        public void Disable()
+        {
+            velocity.value = Vector2.Zero;
+            enabled = false;
+        }
+        public void Enable()
+        {
+            enabled = true;
         }
     }
 }

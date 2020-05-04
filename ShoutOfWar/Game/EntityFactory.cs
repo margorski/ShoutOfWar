@@ -28,6 +28,7 @@ namespace ShoutOfWar.Game
             entity.scale = 2;
             entity.AddComponent(new Velocity());
             entity.AddComponent(new GamepadMovement(200.0f));
+            entity.AddComponent(new PlayerLogic());
 
             var animationController = new DirectionalAnimationControl();
             var animationDelay = 200.0f;
