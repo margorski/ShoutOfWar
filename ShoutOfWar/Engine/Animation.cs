@@ -12,14 +12,23 @@ namespace ShoutOfWar.Engine
 {
     class Animation
     {
+        public double FramesDelay {
+            set 
+            {  
+                if (value < 0.0) throw new ArgumentException("Frames delay cannot be negative");
+                framesDelay = value;
+            }
+            get { return this.framesDelay; }
+        }
+
         private double framesDelay;
         private double currentTime;
         private List<SpriteFrame> frames = new List<SpriteFrame>();
         private int currentFrameIndex;
         
-        public Animation(double framesDelay)
+        public Animation(double FramesDelay)
         {
-            this.framesDelay = framesDelay;
+            this.FramesDelay = FramesDelay;
         }
 
         public void AddFrame(SpriteFrame spriteFrame)
@@ -45,7 +54,7 @@ namespace ShoutOfWar.Engine
         public void Update(GameTime gameTime)
         {
             currentTime += gameTime.ElapsedGameTime.TotalMilliseconds;
-            if (currentTime >= framesDelay)
+            if (currentTime >= FramesDelay)
             {
                 currentTime = 0.0;
                 currentFrameIndex++;

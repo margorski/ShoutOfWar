@@ -43,11 +43,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Engine\Animation.cs" />
-    <Compile Include="Engine\IMyGameComponent.cs" />
-    <Compile Include="MyGame\Npc.cs" />
-    <Compile Include="MyGame\Player.cs" />
+    <Compile Include="Engine\Component.cs" />
+    <Compile Include="Engine\Entity.cs" />
+    <Compile Include="Game\Components\DirectionalAnimationControl.cs" />
+    <Compile Include="Game\Components\GamepadMovement.cs" />
+    <Compile Include="Game\Components\General\AnimatedSprite.cs" />
+    <Compile Include="Game\Components\General\Velocity.cs" />
+    <Compile Include="Game\Components\NpcLogic.cs" />
+    <Compile Include="Game\Components\PlayerLogic.cs" />
+    <Compile Include="Game\EntityFactory.cs" />
+    <Compile Include="Game\Shared.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="MyGame\Shared.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\TexturePackerLoader\SpriteFrame.cs" />

@@ -2,41 +2,45 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ShoutOfWar.Engine;
-using ShoutOfWar.MyGame;
+using ShoutOfWar.Game;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using TexturePackerLoader;
 using TexturePackerMonoGameDefinitions;
+using ShoutOfWar.Game.Shared;
 
 namespace ShoutOfWar
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        SpriteRender spriteRender;
+        public static Game1 Current { private set; get; }
 
-        Random random = new Random();
+        public readonly Point ScreenSize = new Point(1280, 1024);
+        public GraphicsDeviceManager Graphics { private set; get; }
+        public SpriteBatch SpriteBatch { private set; get; }
+        public SpriteRender SpriteRender { private set; get; }
+        public Random Random { private set; get; } = new Random();
 
         // to be moved to Scene
-        SpriteSheet spriteSheet;
-
-        List<IMyGameComponent> gameComponents = new List<IMyGameComponent>();
-
-        readonly Point ScreenSize = new Point(1280, 1024);
+        List<Entity> entities = new List<Entity>();
+        EntityFactory entityFactory;
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = ScreenSize.X;
-            graphics.PreferredBackBufferHeight = ScreenSize.Y;
-            graphics.ApplyChanges();
+            if (Game1.Current != null) throw new Exception("GameObject exists already. That means that something went wrong or someone explicitly try to create Game1 object.");
+
+            Graphics = new GraphicsDeviceManager(this);
+            Graphics.PreferredBackBufferWidth = ScreenSize.X;
+            Graphics.PreferredBackBufferHeight = ScreenSize.Y;
+            Graphics.ApplyChanges();
 
             Content.RootDirectory = "Content";
+
+            Game1.Current = this;
         }
 
         /// <summary>
@@ -49,12 +53,11 @@ namespace ShoutOfWar
         {
             base.Initialize();
 
-            gameComponents.Add(new Player(spriteSheet, spriteRender));
-
-            for (var i = 0; i < 10; i++)
+            entities.Add(entityFactory.createPlayer(new Vector2(500, 500)));
+            for (var i = 0; i < 50; i++)
             {
-                var randomPosition = new Vector2(random.Next(ScreenSize.X), random.Next(ScreenSize.Y));
-                gameComponents.Add(new Npc(spriteSheet, spriteRender, randomPosition));
+                var randomPosition = new Vector2(Random.Next(ScreenSize.X), Random.Next(ScreenSize.Y));
+                entities.Add(entityFactory.createNPC(randomPosition, i.ToString()));                
             }
         }
 
@@ -64,11 +67,12 @@ namespace ShoutOfWar
         /// </summary>
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            spriteRender = new SpriteRender(spriteBatch);
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
+            SpriteRender = new SpriteRender(SpriteBatch);
 
             var spriteSheetLoader = new SpriteSheetLoader(Content, GraphicsDevice);
-            spriteSheet = spriteSheetLoader.Load(@"Spritesheets\mlm_armies\mlm_armies.png");
+            var spriteSheet = spriteSheetLoader.Load(@"Spritesheets\mlm_armies\mlm_armies.png");
+            entityFactory = new EntityFactory(spriteSheet);
         }
 
         /// <summary>
@@ -89,7 +93,7 @@ namespace ShoutOfWar
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            foreach (var component in gameComponents) component.Update(gameTime);
+            foreach (var entity in entities) entity.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -102,11 +106,11 @@ namespace ShoutOfWar
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            this.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
+            this.SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
 
-            foreach (var component in gameComponents) component.Draw(gameTime);            
+            foreach (var entity in entities) entity.Draw(gameTime);            
 
-            this.spriteBatch.End();
+            this.SpriteBatch.End();
 
             base.Draw(gameTime);
         }

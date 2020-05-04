@@ -16,7 +16,7 @@ namespace TexturePackerLoader
             this.spriteBatch = spriteBatch;
         }
 
-        // <param name="position">This should be where you want the pivot point of the sprite image to be rendered.</param>
+        // <param name="position">This should be where you want the pivot point of the sprite image to be rendered.</param>        
         public void Draw(SpriteFrame sprite, Vector2 position, Color? color = null, float rotation = 0, float scale = 1, SpriteEffects spriteEffects = SpriteEffects.None)
         {
             Vector2 origin = sprite.Origin;
