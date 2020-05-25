@@ -23,7 +23,7 @@ namespace ShoutOfWar.Game.Components
         }
 
         private AnimatedSprite animatedSprite;
-        private Velocity velocity;
+        private Dynamic dynamic;
 
         public Dictionary<Direction, Animation> animations = new Dictionary<Direction, Animation>();
 
@@ -33,8 +33,8 @@ namespace ShoutOfWar.Game.Components
 
         public override void Init()
         {
-            animatedSprite = parent.GetComponent<AnimatedSprite>().FirstOrDefault();
-            velocity = parent.GetComponent<Velocity>().FirstOrDefault();
+            animatedSprite = parent.GetComponent<AnimatedSprite>();
+            dynamic = parent.GetComponent<Dynamic>();
 
             if (animatedSprite != null) animatedSprite.animation = animations.FirstOrDefault().Value;
         }
@@ -43,19 +43,22 @@ namespace ShoutOfWar.Game.Components
         {            
             if (animatedSprite == null)
             {
-                animatedSprite = parent.GetComponent<AnimatedSprite>().FirstOrDefault();
+                animatedSprite = parent.GetComponent<AnimatedSprite>();
                 if (animatedSprite == null) return;
             }
-            if (velocity == null)
+            if (dynamic == null)
             {
-                velocity = parent.GetComponent<Velocity>().FirstOrDefault();
-                if (velocity == null) return;
+                dynamic = parent.GetComponent<Dynamic>();
+                if (dynamic == null) return;
             }
 
-            if (Vector2.Normalize(velocity.value).Length() > float.Epsilon)
+            if (Vector2.Normalize(dynamic.Velocity).Length() > float.Epsilon)
             {
-                var speedAngle = Util.GetVectorAngleRad(velocity.value);
-                animatedSprite.animation = animations[(Direction)((int)(speedAngle / (Math.PI / 2)))];
+                // Y axis needs to be mirrored as on screen Y rise in down direction
+                var speedAngle = (Util.GetVectorAngleRad(dynamic.Velocity * new Vector2(0.0f, -1.0f)) + (Math.PI/4));
+                var animationFrame = (int)(speedAngle / (Math.PI / 2)) % 4;
+
+                animatedSprite.animation = animations[(Direction)animationFrame];
                 animatedSprite.animation.Update(gameTime);
             }
             else
@@ -71,6 +74,10 @@ namespace ShoutOfWar.Game.Components
             {
                 animation.FramesDelay = animationDelay;
             }
+        }
+
+        public override void DrawDebug(GameTime gameTime)
+        {
         }
     }
 }

@@ -10,6 +10,7 @@ using TexturePackerLoader;
 using TexturePackerMonoGameDefinitions;
 using ShoutOfWar.Game.Shared;
 using MonoGame.Extended;
+using ShoutOfWar.Game.Components;
 
 namespace ShoutOfWar
 {
@@ -20,23 +21,35 @@ namespace ShoutOfWar
     {
         public static Game1 Current { private set; get; }
 
-        public readonly Point ScreenSize = new Point(1280, 1024);
         public GraphicsDeviceManager Graphics { private set; get; }
         public SpriteBatch SpriteBatch { private set; get; }
         public SpriteRender SpriteRender { private set; get; }
         public Random Random { private set; get; } = new Random();
 
         // to be moved to Scene
-        List<Entity> entities = new List<Entity>();
-        EntityFactory entityFactory;
+        public List<Entity> entities = new List<Entity>();
+        public EntityFactory entityFactory;
+
+        public bool drawDebug = false;
+
+        private KeyboardState keyboardState;
+        private MouseState mouseState;
+
+        public List<Entity> EnabledEntities
+        {
+            get
+            {
+                return entities.FindAll(e => e.enabled);
+            }
+        }
 
         public Game1()
         {
             if (Game1.Current != null) throw new Exception("GameObject exists already. That means that something went wrong or someone explicitly try to create Game1 object.");
 
             Graphics = new GraphicsDeviceManager(this);
-            Graphics.PreferredBackBufferWidth = ScreenSize.X;
-            Graphics.PreferredBackBufferHeight = ScreenSize.Y;
+            Graphics.PreferredBackBufferWidth = Config.ScreenWidth;
+            Graphics.PreferredBackBufferHeight = Config.ScreenHeight;
             Graphics.ApplyChanges();
 
             Content.RootDirectory = "Content";
@@ -53,12 +66,17 @@ namespace ShoutOfWar
         protected override void Initialize()
         {
             base.Initialize();
+            keyboardState = Keyboard.GetState();
 
-            entities.Add(entityFactory.createPlayer(new Vector2(500, 500)));
-            for (var i = 0; i < 50; i++)
-            {
-                var randomPosition = new Vector2(Random.Next(ScreenSize.X), Random.Next(ScreenSize.Y));
-                entities.Add(entityFactory.createNPC(randomPosition, i.ToString()));                
+            entities.Add(entityFactory.createPlayer(new Vector2(Config.ScreenWidth / 2, Config.ScreenHeight / 2)));
+            
+            var teams = new NpcLogic.Team[] { NpcLogic.Team.Red, NpcLogic.Team.Blue };
+            for (var i = 0; i < 2; i++)
+            {            
+                for (var j = 0; j < Config.NumberOfNpcs; j++)
+                {
+                    entities.Add(entityFactory.createNPC(new Vector2(500.0f + i * 1000, 400.0f + j * 30.0f), $"player_{i}{j}", teams[i]));
+                }
             }
         }
 
@@ -94,7 +112,25 @@ namespace ShoutOfWar
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            foreach (var entity in entities) entity.Update(gameTime);
+            var currentKeyboardState = Keyboard.GetState();
+            if (currentKeyboardState.IsKeyDown(Keys.Tab) && keyboardState.IsKeyUp(Keys.Tab)) drawDebug = !drawDebug;
+            keyboardState = currentKeyboardState;
+
+            var currentMouseState = Mouse.GetState();
+            if (currentMouseState.LeftButton == ButtonState.Pressed && mouseState.LeftButton == ButtonState.Released)
+            {
+                entities.Add(entityFactory.createNPC(new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y), $"npc_{entities.Count+1}", NpcLogic.Team.Red));
+            }
+            if (currentMouseState.RightButton == ButtonState.Pressed && mouseState.RightButton == ButtonState.Released)
+            {
+                entities.Add(entityFactory.createNPC(new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y), $"npc_{entities.Count + 1}", NpcLogic.Team.Blue));
+            }
+            mouseState = currentMouseState;
+
+            foreach (var entity in entities)
+            {
+                if (entity.enabled) entity.Update(gameTime);
+            }
 
             base.Update(gameTime);
         }
@@ -109,7 +145,14 @@ namespace ShoutOfWar
 
             this.SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
 
-            foreach (var entity in entities) entity.Draw(gameTime);            
+            foreach (var entity in entities)
+            {
+                if (entity.enabled)
+                {
+                    entity.Draw(gameTime);
+                    if (drawDebug) entity.DrawDebug(gameTime);
+                }
+            }
 
             this.SpriteBatch.End();
 

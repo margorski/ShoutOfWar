@@ -49,9 +49,10 @@
     <Compile Include="Game\Components\DirectionalAnimationControl.cs" />
     <Compile Include="Game\Components\GamepadMovement.cs" />
     <Compile Include="Game\Components\General\AnimatedSprite.cs" />
-    <Compile Include="Game\Components\General\Velocity.cs" />
+    <Compile Include="Game\Components\General\Dynamic.cs" />
     <Compile Include="Game\Components\NpcLogic.cs" />
     <Compile Include="Game\Components\PlayerLogic.cs" />
+    <Compile Include="Game\Config.cs" />
     <Compile Include="Game\EntityFactory.cs" />
     <Compile Include="Game\Shared.cs" />
     <Compile Include="Game1.cs" />

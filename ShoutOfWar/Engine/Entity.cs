@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ShoutOfWar.Engine
 {
-    sealed class Entity
+    public sealed class Entity
     {
         public string Id { private set; get; }
         public Vector2 position;
@@ -29,12 +29,19 @@ namespace ShoutOfWar.Engine
             components.Add(component);
         }
 
-        public IEnumerable<T> GetComponent<T>() where T : Component
-        {
-            var t = components.FindAll(c => { return c.GetType() == typeof(T); });
-            var b = t.Select(c => c as T);
+        public bool HasComponent<T>() where T : Component
+        {            
+            return components.Exists(c => c.GetType() == typeof(T));
+        }
 
-            return components.FindAll(c => c.GetType() == typeof(T)).Select(c => c as T);
+        public T GetComponent<T>(bool onlyEnabled = true) where T : Component
+        {
+            return components.FindAll(c => c.GetType() == typeof(T) && (!onlyEnabled || c.enabled)).Select(c => c as T).FirstOrDefault();
+        }
+
+        public IEnumerable<T> GetComponents<T>(bool onlyEnabled = true) where T : Component
+        {
+            return components.FindAll(c => c.GetType() == typeof(T) && (!onlyEnabled || c.enabled)).Select(c => c as T);
         }
 
         // Run init after adding child components
@@ -45,14 +52,25 @@ namespace ShoutOfWar.Engine
 
         public void Draw(GameTime gameTime)
         {
-            if (!enabled) return;
-            foreach (var component in components) component.Draw(gameTime);
+            foreach (var component in components)
+            {
+                if (component.enabled) component.Draw(gameTime);
+            }
+        }
+        public void DrawDebug(GameTime gameTime)
+        {
+            foreach (var component in components)
+            {
+                if (component.enabled) component.DrawDebug(gameTime);
+            }
         }
 
         public void Update(GameTime gameTime)
         {
-            if (!enabled) return;
-            foreach (var component in components) component.Update(gameTime);            
+            foreach (var component in components)
+            {
+                if (component.enabled) component.Update(gameTime);
+            }
         }
     }
 }

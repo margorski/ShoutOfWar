@@ -12,7 +12,7 @@ using TexturePackerMonoGameDefinitions;
 
 namespace ShoutOfWar.Game
 {
-    class EntityFactory
+    public class EntityFactory
     {
         SpriteSheet spriteSheet;
 
@@ -25,8 +25,10 @@ namespace ShoutOfWar.Game
         {            
             var entity = new Entity($"player{idModifier}");
             entity.position = position;
-            entity.scale = 2;
-            entity.AddComponent(new Velocity());
+            entity.scale = 2;            
+            var dynamic = new Dynamic(200.0f);
+            dynamic.colliderRadius = 15;
+            entity.AddComponent(dynamic);
             entity.AddComponent(new GamepadMovement(200.0f));
             entity.AddComponent(new PlayerLogic());
 
@@ -68,42 +70,44 @@ namespace ShoutOfWar.Game
             return entity;
         }
 
-        public Entity createNPC(Vector2 position, string idModifier = "")
+        public Entity createNPC(Vector2 position, string idModifier = "", NpcLogic.Team team = NpcLogic.Team.None)
         {
             var entity = new Entity($"player{idModifier}");
             entity.position = position;
             entity.scale = 2;
-            entity.AddComponent(new Velocity());
-            entity.AddComponent(new NpcLogic(200.0f, 4000, 150));
+            var dynamic = new Dynamic(150.0f);
+            dynamic.colliderRadius = 10;
+            entity.AddComponent(dynamic);
+            entity.AddComponent(new NpcLogic(4000, 150, team));
 
             var animationController = new DirectionalAnimationControl();
             var animationDelay = 200.0f;
             var moveRight = new Animation(animationDelay);
-            moveRight.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_398));
-            moveRight.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_399));
-            moveRight.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_400));
-            moveRight.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_401));
+            moveRight.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_435));
+            moveRight.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_436));
+            moveRight.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_437));
+            moveRight.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_438));
             animationController.animations.Add(DirectionalAnimationControl.Direction.Right, moveRight);
 
             var moveLeft = new Animation(animationDelay);
-            moveLeft.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_402));
-            moveLeft.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_403));
-            moveLeft.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_404));
-            moveLeft.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_405));
+            moveLeft.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_439));
+            moveLeft.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_440));
+            moveLeft.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_441));
+            moveLeft.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_442));
             animationController.animations.Add(DirectionalAnimationControl.Direction.Left, moveLeft);
 
             var moveUp = new Animation(animationDelay);
-            moveUp.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_394));
-            moveUp.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_395));
-            moveUp.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_396));
-            moveUp.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_397));
+            moveUp.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_431));
+            moveUp.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_432));
+            moveUp.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_433));
+            moveUp.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_434));
             animationController.animations.Add(DirectionalAnimationControl.Direction.Up, moveUp);
 
             var moveDown = new Animation(animationDelay);
-            moveDown.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_390));
-            moveDown.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_391));
-            moveDown.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_392));
-            moveDown.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_393));
+            moveDown.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_427));
+            moveDown.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_428));
+            moveDown.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_429));
+            moveDown.AddFrame(spriteSheet.Sprite(mlm_armies.Mlm_armies_430));
             animationController.animations.Add(DirectionalAnimationControl.Direction.Down, moveDown);
             entity.AddComponent(animationController);
 

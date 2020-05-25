@@ -13,13 +13,13 @@ namespace ShoutOfWar.Game.Components
 {
     class GamepadMovement : Component
     {
-        public float maxSpeed;
+        public float moveSpeed;
 
-        private Velocity velocity;
+        private Dynamic dynamic;
 
-        public GamepadMovement(float maxSpeed)
+        public GamepadMovement(float moveSpeed)
         {
-            this.maxSpeed = maxSpeed;
+            this.moveSpeed = moveSpeed;
         }
 
         public override void Draw(GameTime gameTime)
@@ -34,24 +34,28 @@ namespace ShoutOfWar.Game.Components
         {
             if (!enabled) return;
 
-            if (velocity == null)
+            if (dynamic == null)
             {
-                velocity = parent.GetComponent<Velocity>().FirstOrDefault();
+                dynamic = parent.GetComponent<Dynamic>();
             }
 
-            if (velocity != null) {
-                velocity.value = new Vector2(maxSpeed, -maxSpeed) * GamePad.GetState(PlayerIndex.One).ThumbSticks.Left;
+            if (dynamic != null) {
+                dynamic.Velocity = new Vector2(moveSpeed, -moveSpeed) * GamePad.GetState(PlayerIndex.One).ThumbSticks.Left;                
             }
         }
 
         public void Disable()
         {
-            velocity.value = Vector2.Zero;
+            dynamic.Velocity = Vector2.Zero;
             enabled = false;
         }
         public void Enable()
         {
             enabled = true;
+        }
+
+        public override void DrawDebug(GameTime gameTime)
+        {
         }
     }
 }
